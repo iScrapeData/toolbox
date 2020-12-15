@@ -12,9 +12,7 @@ import threading
 # Working with Files
 import pandas as pd
 import csv
-from time import time, sleep
-from random import randint
-from datetime import datetime
+from time import time
 import pendulum
 import os
 
@@ -172,7 +170,6 @@ def Scraper(row):
                 [
                     pendulum.now().format("YYYY-MM-DD"),
                     pendulum.now().format("HH:mm:ss"),
-                    abort,
                     row,
                     you_vars,
                     url[row],
@@ -201,13 +198,13 @@ if __name__ == "__main__":
       mutex.acquire()
 
       # Set to 1 for testing
-      # Set to #len(df_source) for production
+      # Set to range(len(df_source)) for production
       for row in range(1): 
 
           # Some condition to decide to scrape the url or not
           # Handy if you expect to stop/restart the scraper
           # without duplicating API calls or iterations.
-          if (var_exits is True or var_done in df_done.values()):
+          if True:
 
               # You could set up a Log here
               pass
