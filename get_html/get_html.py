@@ -1,3 +1,7 @@
+"""
+See README file for more information on this program.
+"""
+
 # Make requests
 import requests
 
@@ -16,32 +20,6 @@ import os
 
 # Upload files to Google cloud Platform
 from up_to_gcs import up_to_gc
-
-
-"""
-* This script incurs costs when run. 
-Namely a subscription to Scraperapi.com, 
-and Google Cloud Storage costs.
-
-This program scrapes html pages from a series
-and uploads them to a Google Cloud Storage Bucket.
-
-Instructions for using GCS:
-
-Scrape almost any page on the web. 
-Even if it uses JavaScript to load content.
-
-Scrape fast with concurrent scraping.
-
-Scrape anonymously with a proxy and Residential IP 
-Recommended: www.scraperapi.com
-
-Note: It's easier to separate building urls from the 
-scraping process when you have hundreds of thousands 
-or milions of them. So, in the global variables I created
-a 'url' variable that is iterated over from a dataframe.
-But that's another script.
-"""
 
 # Initialize datetime (for logging only)
 dt_start = pendulum.now()
