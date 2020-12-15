@@ -52,11 +52,13 @@ def Scraper(row):
     global url
     global var
 
+    # NOTE: DO NOT LOG OR RECORD THIS VARIABLE
     # Scraper API Key URL String
     api_url = f"http://api.scraperapi.com?api_key=<your_key>&url={url[row]}"
       
     # Logging relevant variables prior to use
     try:
+
         mutex.acquire()
         with open(
             f"Logs/relevant_variables.csv",
@@ -71,12 +73,13 @@ def Scraper(row):
                     pendulum.now().format("YYYY-MM-DD"),
                     pendulum.now().format("HH:mm:ss"),
                     row,
-                    your_vars,
+                    your_vars[row],
                     url[row],
                     os.path.realpath(__file__),
                 ]
             )
         mutex.release()
+
     except Exception as e:
         
         with open(f"Logs/filings.csv", "a", newline="") as f:
@@ -88,7 +91,7 @@ def Scraper(row):
                         pendulum.now().format("YYYY-MM-DD"),
                         pendulum.now().format("HH:mm:ss"),
                         row,
-                        your_vars,
+                        your_vars[row],
                         url[row],
                         e,
                         os.path.realpath(__file__),
@@ -127,7 +130,7 @@ def Scraper(row):
                         pendulum.now().format("YYYY-MM-DD"),
                         pendulum.now().format("HH:mm:ss"),
                         row,
-                        your_vars,
+                        your_vars[row],
                         url[row],
                         os.path.realpath(__file__),
                     ]
@@ -150,7 +153,7 @@ def Scraper(row):
                         pendulum.now().format("HH:mm:ss"),
                         status_code,
                         row,
-                        your_vars,
+                        your_vars[row],
                         url[row],
                         os.path.realpath(__file__),
                     ]
@@ -171,7 +174,7 @@ def Scraper(row):
                     pendulum.now().format("YYYY-MM-DD"),
                     pendulum.now().format("HH:mm:ss"),
                     row,
-                    you_vars,
+                    you_vars[row],
                     url[row],
                     os.path.realpath(__file__),
                     e,
