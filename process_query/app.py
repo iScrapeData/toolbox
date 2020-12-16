@@ -3,9 +3,9 @@ from .search_string import processit
 
 app = Flask(__name__)
 
-@app.route("/")
-@app.route("/index")
-@app.route("/home")
+@app.route("/", methods=["POST","GET"])
+@app.route("/index", methods=["POST","GET"])
+@app.route("/home", methods=["POST","GET"])
 def index():
 
     # Default
