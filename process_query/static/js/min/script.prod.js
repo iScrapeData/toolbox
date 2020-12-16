@@ -1,0 +1,1 @@
+"use strict";function myFunction(){var e=document.getElementById("q").value,t=isNaN(e)||e<1||10<e?"Please enter a search term":None;document.getElementById("alert").innerHTML=t}

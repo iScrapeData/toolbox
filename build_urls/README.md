@@ -21,4 +21,4 @@ Output - https://www.example.com/var_1/var_3/var_4/var_x/
 
 Bonus: We'll also use this program to prefabricate output filenames for the scraper as well. I separate concerns this way so that my Scraper only has to do one thing - my motto - "Get the data."
 
-Note: Never include your API key in the url variable, or anywhere that it would be recorded/logged into other documents. Always place keys and other credentials directly into code. You don't want your credentials showing up in logs or output/input files. You could also store credentials in an external file. But that's only necessary in a web application or in software.
+Note: Never include your API key in the url variable, or anywhere that it would be recorded/logged into other documents. And never in code that would be served to a user's browser. Always place keys and other credentials directly into backend code only. You don't want your credentials showing up in logs or output/input files, or a browser's sources. You could also store credentials in an external file. But that's only necessary in a web application or in software.
