@@ -48,6 +48,8 @@ def Creator(row):
     global var_4
     global var_5
     global var_x
+    global mutex
+    mutex2 = threading.Lock()
 
     # Load empty array to store iteration data
     data_row = []
@@ -75,9 +77,9 @@ def Creator(row):
     df_urls = pd.DataFrame(array)
 
     # Append df to urls.csv
-    mutex.acquire()
+    mutex2.acquire()
     df_urls.to_csv(f"urls.csv", mode="a", header=False, index=False)
-    mutex.release()
+    mutex2.release()
 
 if __name__ == "__main__":
 

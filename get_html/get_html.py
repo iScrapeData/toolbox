@@ -51,6 +51,9 @@ def Scraper(row):
     # Initialize Globals
     global url
     global var
+    global mutex
+    mutex2 = threading.Lock()
+    mutex3 = threading.Lock()
 
     # NOTE: DO NOT LOG OR RECORD THIS VARIABLE
     # Scraper API Key URL String
@@ -59,7 +62,7 @@ def Scraper(row):
     # Logging relevant variables prior to use
     try:
 
-        mutex.acquire()
+        mutex2.acquire()
         with open(
             f"Logs/relevant_variables.csv",
             "a",
@@ -78,7 +81,7 @@ def Scraper(row):
                     os.path.realpath(__file__),
                 ]
             )
-        mutex.release()
+        mutex2.release()
 
     except Exception as e:
         
@@ -120,7 +123,7 @@ def Scraper(row):
             # Delete
             os.remove("o.csv")
 
-            mutex.acquire()
+            mutex3.acquire()
             with open(f"Logs/filings.csv", "a", newline="") as f:
 
                 write = csv.writer(f)
@@ -135,7 +138,7 @@ def Scraper(row):
                         os.path.realpath(__file__),
                     ]
                 )
-            mutex.release()
+            mutex3.release()
 
         else:
 

@@ -11,6 +11,8 @@ mutex = threading.Lock()
 # Pretend Function
 def Scraper(row):
 
+    global mutex
+
     print(f"{row}: makes Jack a dull boy.",end="\n")
 
 if __name__ == "__main__":
