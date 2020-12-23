@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
             pass_1 = var_1[row] in done.col.values
 
-            if (pass_1 is False):
+            if pass_1 is False:
 
                 # Enter the scraper
                 pool.submit(Scraper, row)
