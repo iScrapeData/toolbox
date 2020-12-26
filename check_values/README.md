@@ -11,3 +11,6 @@ Check your logic in a training program - tester.py
 
 # Step 3
 Go live!
+
+# DISCLAIMER
+This code is not perfect. Also, it was developed in a VS Code and Windows environment. Additional debugging may be required on another OS.

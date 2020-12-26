@@ -15,3 +15,6 @@ It's easiest to separate the task of building urls to scrape from the scraping p
 
 # CUSTOM IMPORTS
 up_to_gcs.py - uploads files to Google Cloud Storage Bucket
+
+# DISCLAIMER
+This code is not perfect. Also, it was developed in a VS Code and Windows environment. Additional debugging may be required on another OS.

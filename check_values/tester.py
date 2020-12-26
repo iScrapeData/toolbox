@@ -36,7 +36,7 @@ if __name__ == "__main__":
         for row in range(len(df_master)):
 
             # Check row of one df against col of another
-            if df_master.cusip[row] in df_filter.cusip.values:
+            if df_master.col[row] in df_filter.col.values:
 
                 print(f"{row}: All work and no play",end="\n")
                 pass

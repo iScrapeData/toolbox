@@ -16,6 +16,7 @@ import os
 from up_to_gcs import up_to_gc
 from logger import *
 from read_blob import read
+from upload_missing import blob_metadata
 
 play("your-main-script.py", "script-started")
 
@@ -87,19 +88,6 @@ def Scraper(row):
                     "html-not-desired",
                 )
 
-                mutex2.acquire()
-                # Record this iteration
-                with open("done.csv", "a", newline="") as a:
-
-                    write = csv.writer(a)
-
-                    write.writerow(
-                        [
-                            var_1[row],
-                        ]
-                    )
-                mutex2.release()
-
             else:
 
                 # Your filename should have been prefabricated.
@@ -115,33 +103,53 @@ def Scraper(row):
                     f.write(text)
 
                 # Upload
-                up_to_gc(
-                    "bucket_name",
-                    f"{filename[row]}",
-                    f"gcp/path/to/folder/{filename[row]}",
-                )
+                # Upload
+                # Upload
+                try: 
+
+                    mutex2.acquire()
+                    up_to_gc(
+                        "bucket-name",
+                        f"{filename[row]}",
+                        f"historical_subs/subs/Other/{filename[row]}"
+                    )
+                    mutex2.release()
+
+                except Exception as e:
+                                      
+                    UploadError(
+                        "your-main-script.py",
+                        "Upload Error",
+                        var_1[row],
+                        var_2[row],
+                        var_3[row],
+                        var_4[row],
+                        filename[row],
+                        url[row],
+                        e,
+                    )
 
                 # Log this iteration as done and delete the 
                 # local file
                 if os.path.exists(f"{filename[row]}"):
 
-                    mutex3.acquire()
-                    with open("done.csv", "a", newline="") as a:
-
-                        write = csv.writer(a)
-
-                        write.writerow(
-                            [
-                                var_1[row],
-                            ]
-                        )
-                    mutex3.release()
-
                     os.remove(f"{filename[row]}")
-
+                    
                 else:
                   
                     pass
+
+            mutex3.acquire()
+            with open("done.csv", "a", newline="") as a:
+
+                write = csv.writer(a)
+
+                write.writerow(
+                    [
+                        var_1[row],
+                    ]
+                )
+            mutex3.release()
 
         else:
 
@@ -176,6 +184,9 @@ if __name__ == "__main__":
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
 
+        # Prevent data race step 4, Wait before iterating
+        mutex.acquire()
+        
         done_file = f"done.csv"
 
         done = pd.read_csv(done_file, dtype=str)
@@ -190,9 +201,6 @@ if __name__ == "__main__":
         var_4 = df_source.var_4
         filename = df_source.filename
         url = df_source.url
-
-        # Prevent data race step 4, Wait before iterating
-        mutex.acquire()
 
         # Range set to 5 for local testing
         for row in range(5):  # len(df_source)
