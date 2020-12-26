@@ -28,18 +28,15 @@ def search(directory):
 
         try: 
 
-            # Does the file exists in GCP?
-            # False throws an exception
-            check = blob_metadata("bucket_name", f"pseudo/path/to/{filename}")
-
-        except:
-
-            # TODO: Logic to upload missing
-            up_to_gc("bucket_name", f"{directory}{filename}", f"pseudo/path/to/{filename}")
+            up_to_gc("bucket-name", f"{directory}{filename}", f"pseudo/path/to/{filename}")
 
             print(f"{filename} uploaded")
 
             missing += 1
+
+        except:
+
+            pass
 
     print(f"{missing} files uploaded")
 
