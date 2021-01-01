@@ -97,7 +97,7 @@ def Scraper(row):
                 # up to create the filename, is that the file 
                 # extension is already included. Don't reappend 
                 # here.
-                with open(f"{filename[row]}", "w") as f:
+                with open(f"/home/your_root_directory/{filename[row]}", "w") as f:
 
                     # Write
                     f.write(text)
@@ -110,8 +110,8 @@ def Scraper(row):
                     mutex2.acquire()
                     up_to_gc(
                         "bucket-name",
-                        f"{filename[row]}",
-                        f"historical_subs/subs/Other/{filename[row]}"
+                        f"/home/your_root_directory/{filename[row]}",
+                        f"psuedo/path/to/{filename[row]}"
                     )
                     mutex2.release()
 
@@ -131,16 +131,18 @@ def Scraper(row):
 
                 # Log this iteration as done and delete the 
                 # local file
-                if os.path.exists(f"{filename[row]}"):
+                mutex.acquire()
+                if os.path.exists(f"/home/your_root_directory/{filename[row]}"):
 
-                    os.remove(f"{filename[row]}")
+                    os.remove(f"/home/your_root_directory/{filename[row]}")
                     
                 else:
                   
                     pass
+                mutex.release()
 
             mutex3.acquire()
-            with open("done.csv", "a", newline="") as a:
+            with open("/home/your_root_directory/done.csv", "a", newline="") as a:
 
                 write = csv.writer(a)
 
@@ -187,13 +189,18 @@ if __name__ == "__main__":
         # Prevent data race step 4, Wait before iterating
         mutex.acquire()
         
-        done_file = f"done.csv"
+        done_file = f"/home/your_root_directory/done.csv"
 
         done = pd.read_csv(done_file, dtype=str)
 
+        # Read your urls and other data from table or df file
         content = read("bucket_name", "source_file_name") 
 
         df_source = pd.read_csv(content, dtype=str)
+
+        done.drop_duplicates()
+
+        df_source.drop_duplicates()
 
         var_1 = df_source.var_1
         var_2 = df_source.var_2

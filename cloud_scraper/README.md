@@ -58,7 +58,7 @@ Set workers to 1 and the worker for loop to 5.
 We're just testing here.
 python3 your-main-script.py
 
-Tip: When the scraper is finished and all of your work is done, download any files written to VM disk that you need, save VM instance image to the project's folder, set automatic delete if needed, release firewall ip and any reserved IP address(es), and delete VM. You are being charged for all of this as long as it exists.
+Tip: When the scraper is finished and all of your work is done, download any files written to VM disk that you need, save VM instance image to the project's folder (if needed), and delete VM. You are being charged for all of this as long as it exists.
 
 # RELEVANT GOOGLE CLOUD PLATFORM HELP
 
@@ -76,7 +76,7 @@ https://towardsdatascience.com/how-to-start-a-data-science-project-using-google-
 Creating a service account key for local authentication:
 If you're running on your VM, you won't need the keys that I call with the Client() in the helper files, but I included them anyway to make it easier for you when if you use the files on a non-authenticated GCP platform, or your local computer. 
 
-You'll store this JSON file (your-gcp-service-key.json) key in your project's main folder (where I have the placeholder) to authenticate to your GCP resources. Be sure to give it the permission it needs when you created (usually read/write permission for logging and storage buckets). With that said, for best practice, use the <em>least privileged</em> concept - only the permission needed for the project. I give my scrapers permission to read/write logs and to read/write bucket data.
+You'll store this JSON file (your-gcp-service-key.json) key in your project's main folder (where I have the placeholder) to authenticate to your GCP resources. Be sure to give it the permission it needs when you created (usually read/write permission for logging and storage buckets). With that said, for best practice, use the <em>least privileged</em> concept - only the permission needed for the project. I give my scrapers permission to read/write logs and to read/write bucket data. But not delete permissions. That give me a built in method to avoid duplicate entries.
 
 https://console.cloud.google.com/apis/credentials/serviceaccountkey
 
@@ -94,13 +94,26 @@ https://www.kaggle.com/c/talkingdata-adtracking-fraud-detection/discussion/56014
 Any mutex that's defined outside of your function, be sure to define it as a global variable within the function. Otherwise, your workers may completely forget what a mutex is once inside your function, which will cause a hang.
 
 # ULIMIT
-Increase your ulimit to something respectable if you're on a linux or Debian VM like I use. Otherwise, you may get a "too many files open" error.
+Increase your ulimit to something respectable if you're on a linux or Debian VM like I use. Otherwise, you may get a "too many files open" error. Also, you have to do this every time you connect to your VM instance (no restart, but connect).
 
 Commands
-ulimit -n 128444
-ulimit -u 128444
+ulimit -a
+ulimit -n 128447
+ulimit -u 128447
+*This number will vary depending on your instance resources. I usually just match the -n to the -u, which should already be set high by default.
 
 Source: https://support.imply.io/hc/en-us/articles/360013273774-If-you-re-having-a-too-many-open-files-problem-I-feel-bad-for-you-son-but-I-got-99-problems-and-a-ulimit-setting-ain-t-one-
+
+# Processing the Task
+Your VM processes stop once you disconnect from your SSH session. That's including your scraper. So, the fix is to append the nohup and "&" commands when you start your script. It's simple:
+
+nohup python3 your-main-scrip.py 2>&1 &
+
+The appendages send the process to the background, enabling you to continue to use the terminal for other commands. And it ignores the hangup e.g. you disconnecting from the SSH session.
+
+If you want to know more about this, read this article: https://support.ehelp.edu.au/support/solutions/articles/6000089713-tips-for-running-jobs-on-your-vm
+
+If you need to work with your processes e.g. view and/or kill, see this article: https://phoenixnap.com/kb/how-to-kill-a-process-in-linux
 
 # TROUBLESHOOTING
 This section is most useful if you somehow inappropriately alter the code for GCP uploading, logging, or mutex placement. As these methods may not throw an error, but will cause your workers to skip all code that follows if used improperly. Also, if you use this program on a local computer and network with insufficient resources. And finally, this section is useful because the program just isn't perfect.
@@ -112,7 +125,7 @@ up_to_gc("get-data-scrapers", f"{filing_type}_{filename[row]}", f"historical_sub
 Incorrect
 up_to_gc("get-data-scrapers", f"{filing_type}_{filename[row]}", f"historical_subs/subs/Other/{filing_type}_{filename[row]}",)
 
-That extra comma may not throw an error, though it is an error. The extra comma isn't ignored like it is with a Python dictionary. And it will kill your worker as described above.
+That extra comma may not throw an error Python, though it is an error because GCP hates trailing commas. And it will kill your worker as described above.
 
 Also, improper use of the Mutex will not throw an error. Your workers will just do funny things like, stopping a the code just above where the error exists.
 
@@ -122,6 +135,58 @@ Otherwise, you should not need the troubleshooting scripts below. I've F'd up en
 If for some reason the code leaves behind file, or you just want to verify files' existence, use the upload_missing.py (standalone) file to do work on the directory. 
 
 This script searches for filenames in the GCP cloud directory and from there, you can just count, verify, or write some logic that uploads the missing files. To upload, just import up_to_gcs.py to upload_missing.py and call the function.
+
+Here's my workflow:
+
+Let's say I have to stop my script for some reason and a bunch of files are left behind; but I have no idea if they have been uploaded to gcp or not.
+
+Check for files left behind with the terminal ls command.
+
+Copy the files to your clipboard and create a Python list of them. I use this hand tool to create my list: https://txtformat.com/. It allows you to append your quotation marks and commas all at once.
+
+In your VM terminal, start a Python shell: 
+
+python3
+
+Make your imports:
+
+import os
+from up_to_gcs import up_to_gc
+from upload_missing import blob_metadata, search
+
+Create your list in Python shell script: 
+
+lst = [paste from site txtformat]
+
+Cut-n-paste this command - checks GCP Bucket and returns files that are NOT in GCP bucket:
+
+for i in lst:
+
+    try:
+        blob_metadata("bucket-name", f"psuedo/path/to/{i}")
+    except:
+        print(i)
+
+If no files are returned, you can skip this step and go to File Removal below. Cut and past the list of files returned into txtformat and create lst2 the same way you did with the first list.
+
+Add list 2 to Python shell script: 
+
+lst2 = [paste from site txtformat]
+
+Cut-n-paste this command - uploads missing files to gcp:
+
+for i in lst2:
+
+    up_to_gc("bucket-name",f"/home/your_root_directory/{i}",f"psuedo/path/to/{i}")
+
+File Removal
+Cut-n-paste this command - removes all files left behind by interrupting your main script:
+
+for i in lst:
+
+    os.remove(f"{i}")
+
+exit() - exit Python shell
 
 ## Compare Files
 In combination with the upload_missing.py, I added a script (comparison.py) to test two files are identical. You can import this into upload_missing.py to add it to your logic, or just use it as a stand alone tool.
