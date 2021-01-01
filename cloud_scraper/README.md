@@ -7,7 +7,9 @@ This script costs you money. Namely, I use a proxy service called scraperapi.com
 # SUGGESTED WORKFLOW
 Create virtual environment in the root folder of project with terminal command (windows):
 
+```
 python3 -m venv <name of environment>
+```
 
 Activate the venv: Navigate to the root folder containing your venv and open it in terminal. Use command: env\Scripts\activate
 
@@ -25,38 +27,68 @@ When you SSH into your VM, verify your environment.
 Run the following bash shell commands:
 
 Verify Python version:
+
+```
 python3 --version
+```
 
 Get updated:
+
+```
 sudo apt-get update
+```
 
 Install pip3 and Python Venv:
+
+```
 sudo apt install python3-venv python3-pip
+```
 
 Verify pip3 version:
+
+```
 pip3 --version
+```
 
 Create a venv on the VM:
+
+```
 python3 -m venv <name of environment>
+```
 
 Verify it was created:
+
+```
 ls
+```
 
 Upload all necessary files (at least all files in the cloud_scraper folder):
+
 Verify the uploads:
+
+```
 ls
+```
 
 Activate your venv:
+
+```
 source <name of environment>/bin/activate
+```
 
 Install dependencies:
-pip3 install -r requirements.txt
 
+```
+pip3 install -r requirements.txt
+```
 
 Run your-main-script.py and debug (still in venv): 
 Set workers to 1 and the worker for loop to 5.
 We're just testing here.
+
+```
 python3 your-main-script.py
+```
 
 Tip: When the scraper is finished and all of your work is done, download any files written to VM disk that you need, save VM instance image to the project's folder (if needed), and delete VM. You are being charged for all of this as long as it exists.
 
@@ -97,9 +129,13 @@ Any mutex that's defined outside of your function, be sure to define it as a glo
 Increase your ulimit to something respectable if you're on a linux or Debian VM like I use. Otherwise, you may get a "too many files open" error. Also, you have to do this every time you connect to your VM instance (no restart, but connect).
 
 Commands
+
+```
 ulimit -a
 ulimit -n 128447
 ulimit -u 128447
+```
+
 *This number will vary depending on your instance resources. I usually just match the -n to the -u, which should already be set high by default.
 
 Source: https://support.imply.io/hc/en-us/articles/360013273774-If-you-re-having-a-too-many-open-files-problem-I-feel-bad-for-you-son-but-I-got-99-problems-and-a-ulimit-setting-ain-t-one-
@@ -107,9 +143,11 @@ Source: https://support.imply.io/hc/en-us/articles/360013273774-If-you-re-having
 # Processing the Task
 Your VM processes stop once you disconnect from your SSH session. That's including your scraper. So, the fix is to append the nohup and "&" commands when you start your script. It's simple:
 
+```
 nohup python3 your-main-scrip.py 2>&1 &
+```
 
-The appendages send the process to the background, enabling you to continue to use the terminal for other commands. And it ignores the hangup e.g. you disconnecting from the SSH session.
+The commands send the process to the background, enabling you to continue to use the terminal for other commands. And it ignores the hangup e.g. you disconnecting from the SSH session.
 
 If you want to know more about this, read this article: https://support.ehelp.edu.au/support/solutions/articles/6000089713-tips-for-running-jobs-on-your-vm
 
@@ -120,10 +158,16 @@ This section is most useful if you somehow inappropriately alter the code for GC
 
 Example:
 Correct
+
+```
 up_to_gc("get-data-scrapers", f"{filing_type}_{filename[row]}", f"historical_subs/subs/Other/{filing_type}_{filename[row]}")
+```
 
 Incorrect
+
+```
 up_to_gc("get-data-scrapers", f"{filing_type}_{filename[row]}", f"historical_subs/subs/Other/{filing_type}_{filename[row]}",)
+```
 
 That extra comma may not throw an error Python, though it is an error because GCP hates trailing commas. And it will kill your worker as described above.
 
@@ -146,47 +190,66 @@ Copy the files to your clipboard and create a Python list of them. I use this ha
 
 In your VM terminal, start a Python shell: 
 
+```
 python3
+```
 
 Make your imports:
 
+```
 import os
 from up_to_gcs import up_to_gc
 from upload_missing import blob_metadata, search
+```
 
 Create your list in Python shell script: 
 
+```
 lst = [paste from site txtformat]
+```
 
 Cut-n-paste this command - checks GCP Bucket and returns files that are NOT in GCP bucket:
 
+```
 for i in lst:
 
     try:
         blob_metadata("bucket-name", f"psuedo/path/to/{i}")
     except:
         print(i)
+```
 
 If no files are returned, you can skip this step and go to File Removal below. Cut and past the list of files returned into txtformat and create lst2 the same way you did with the first list.
 
 Add list 2 to Python shell script: 
 
+```
 lst2 = [paste from site txtformat]
+```
 
 Cut-n-paste this command - uploads missing files to gcp:
 
+```
 for i in lst2:
 
     up_to_gc("bucket-name",f"/home/your_root_directory/{i}",f"psuedo/path/to/{i}")
+```
 
 File Removal
+
 Cut-n-paste this command - removes all files left behind by interrupting your main script:
 
+```
 for i in lst:
 
     os.remove(f"{i}")
+```
 
-exit() - exit Python shell
+```
+exit() 
+```
+
+exit Python shell
 
 ## Compare Files
 In combination with the upload_missing.py, I added a script (comparison.py) to test two files are identical. You can import this into upload_missing.py to add it to your logic, or just use it as a stand alone tool.
