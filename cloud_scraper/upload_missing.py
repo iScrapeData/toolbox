@@ -37,9 +37,7 @@ def search(directory):
         except:
 
             pass
+          
+        os.remove(f"{directory}{filename}") 
 
     print(f"{missing} files uploaded")
-
-# Use for direct search
-# comment out or delete if exporting to script
-search("path/to/folder/")

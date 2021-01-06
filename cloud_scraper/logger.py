@@ -56,8 +56,28 @@ def variables(log_name, script, Var_1, Var_2, Var_3, Var_4, filename, url):
         }
     )
 
-# (Optional) Log your logic to dertimen that page does
-# not contain the data that you neeed
+def requested(file_, log_name, row, status_code, sample, url):
+
+    # Instantiates a client
+    logging_client = logging.Client.from_service_account_json(
+        'your-gcp-service-key.json')
+
+    # Selects the log to write to
+    logger = logging_client.logger(log_name)
+
+    # Struct log. The struct can be any JSON-serializable dictionary.
+    logger.log_struct(
+        {
+            "File" : file_,
+            "Row" : row, 
+            "Status Code" : status_code,
+            "Sample": sample,
+            "URL" : url
+        }
+    )
+
+# (Optional) Log the logic that determines that a page does
+# not contain the data that you need
 def aborted(log_name, script, Var_1, Var_2, Var_3, Var_4, filename, url, message):
 
     # Instantiates a client

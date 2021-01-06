@@ -108,7 +108,7 @@ https://towardsdatascience.com/how-to-start-a-data-science-project-using-google-
 Creating a service account key for local authentication:
 If you're running on your VM, you won't need the keys that I call with the Client() in the helper files, but I included them anyway to make it easier for you when if you use the files on a non-authenticated GCP platform, or your local computer. 
 
-You'll store this JSON file (your-gcp-service-key.json) key in your project's main folder (where I have the placeholder) to authenticate to your GCP resources. Be sure to give it the permission it needs when you created (usually read/write permission for logging and storage buckets). With that said, for best practice, use the <em>least privileged</em> concept - only the permission needed for the project. I give my scrapers permission to read/write logs and to read/write bucket data. But not delete permissions. That give me a built in method to avoid duplicate entries.
+You'll store this JSON file (your-gcp-service-key.json) key in your project's main folder (where I have the placeholder) to authenticate to your GCP resources. Be sure to give it the permission it needs when you created (usually read/write permission for logging and storage buckets). With that said, for best practice, use the <em>least privileged</em> concept - only the permission needed for the project. I give my scrapers permission to read/write logs and to read/write bucket data. But not delete permissions. That gives me a built in method to avoid duplicate entries.
 
 https://console.cloud.google.com/apis/credentials/serviceaccountkey
 
@@ -176,80 +176,33 @@ Also, improper use of the Mutex will not throw an error. Your workers will just 
 Otherwise, you should not need the troubleshooting scripts below. I've F'd up enough for you.
 
 ## Upload Missing
-If for some reason the code leaves behind file, or you just want to verify files' existence, use the upload_missing.py (standalone) file to do work on the directory. 
+If for some reason the code leaves behind files, or you just want to verify files' existence for some reason, use the upload_missing.py (standalone) file to do work on the directory. 
 
-This script searches for filenames in the GCP cloud directory and from there, you can just count, verify, or write some logic that uploads the missing files. To upload, just import up_to_gcs.py to upload_missing.py and call the function.
+This script has two functions. blob_metadata() simply searches for a file in gcs bucket. searchDestroy() searches for the file as well, but also uploads it if not found in gcs bucket and deletes it if it exists.
 
 Here's my workflow:
 
 Let's say I have to stop my script for some reason and a bunch of files are left behind; but I have no idea if they have been uploaded to gcp or not.
 
-Check for files left behind with the terminal ls command.
+It's simple:
 
-Copy the files to your clipboard and create a Python list of them. I use this hand tool to create my list: https://txtformat.com/. It allows you to append your quotation marks and commas all at once.
-
-In your VM terminal, start a Python shell: 
+Enter Python shell
 
 ```
 python3
-```
+````
 
-Make your imports:
-
-```
-import os
-from up_to_gcs import up_to_gc
-from upload_missing import blob_metadata, search
-```
-
-Create your list in Python shell script: 
+Make your import
 
 ```
-lst = [paste from site txtformat]
+from upload_missing import SearchDestroy
 ```
 
-Cut-n-paste this command - checks GCP Bucket and returns files that are NOT in GCP bucket:
+Run the script
 
 ```
-for i in lst:
-
-    try:
-        blob_metadata("bucket-name", f"psuedo/path/to/{i}")
-    except:
-        print(i)
+searchDestroy("/home/your_root_directory/scraped_files_folder/")
 ```
-
-If no files are returned, you can skip this step and go to File Removal below. Cut and past the list of files returned into txtformat and create lst2 the same way you did with the first list.
-
-Add list 2 to Python shell script: 
-
-```
-lst2 = [paste from site txtformat]
-```
-
-Cut-n-paste this command - uploads missing files to gcp:
-
-```
-for i in lst2:
-
-    up_to_gc("bucket-name",f"/home/your_root_directory/{i}",f"psuedo/path/to/{i}")
-```
-
-File Removal
-
-Cut-n-paste this command - removes all files left behind by interrupting your main script:
-
-```
-for i in lst:
-
-    os.remove(f"{i}")
-```
-
-```
-exit() 
-```
-
-exit Python shell
 
 ## Compare Files
 In combination with the upload_missing.py, I added a script (comparison.py) to test two files are identical. You can import this into upload_missing.py to add it to your logic, or just use it as a stand alone tool.

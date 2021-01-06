@@ -1,7 +1,7 @@
 # Make requests
 import requests
 
-# Parallel Programming
+# Concurrent Programming
 import concurrent.futures
 
 # Prevent data race step 1
@@ -39,6 +39,7 @@ def Scraper(row):
     # Add inter-function mutexes as well
     mutex2 = threading.Lock()
     mutex3 = threading.Lock()
+    mutex4 = threading.Lock()
 
     api_url = f"http://api.scraperapi.com?api_key=your_key&url={url[row]}"
 
@@ -63,6 +64,15 @@ def Scraper(row):
             status_code = req.status_code
 
             text = req.text
+
+            requested(
+                    "your-main-script.py",
+                    "request-log",
+                    row,
+                    status_code,
+                    text[:25],
+                    url[row],
+                )
 
         if status_code >= 200 and status_code < 300:
 
@@ -97,20 +107,18 @@ def Scraper(row):
                 # up to create the filename, is that the file 
                 # extension is already included. Don't reappend 
                 # here.
-                with open(f"/home/your_root_directory/{filename[row]}", "w") as f:
+                with open(f"/home/your_root_directory/scraped_files_folder/{filename[row]}", "w") as f:
 
                     # Write
                     f.write(text)
 
-                # Upload
-                # Upload
                 # Upload
                 try: 
 
                     mutex2.acquire()
                     up_to_gc(
                         "bucket-name",
-                        f"/home/your_root_directory/{filename[row]}",
+                        f"/home/your_root_directory/scraped_files_folder/{filename[row]}",
                         f"psuedo/path/to/{filename[row]}"
                     )
                     mutex2.release()
@@ -129,20 +137,19 @@ def Scraper(row):
                         e,
                     )
 
-                # Log this iteration as done and delete the 
-                # local file
-                mutex.acquire()
-                if os.path.exists(f"/home/your_root_directory/{filename[row]}"):
+                # Delete local file
+                mutex3.acquire()
+                if os.path.exists(f"/home/your_root_directory/scraped_files_folder/{filename[row]}"):
 
-                    os.remove(f"/home/your_root_directory/{filename[row]}")
+                    os.remove(f"/home/your_root_directory/scraped_files_folder/{filename[row]}")
                     
                 else:
                   
                     pass
-                mutex.release()
+                mutex3.release()
 
-            mutex3.acquire()
-            with open("/home/your_root_directory/done.csv", "a", newline="") as a:
+            mutex4.acquire()
+            with open("/home/your_root_directory/scraped_files_folder/done.csv", "a", newline="") as a:
 
                 write = csv.writer(a)
 
@@ -151,7 +158,7 @@ def Scraper(row):
                         var_1[row],
                     ]
                 )
-            mutex3.release()
+            mutex4.release()
 
         else:
 
@@ -184,12 +191,12 @@ def Scraper(row):
 
 if __name__ == "__main__":
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as pool:
 
         # Prevent data race step 4, Wait before iterating
         mutex.acquire()
         
-        done_file = f"/home/your_root_directory/done.csv"
+        done_file = f"/home/your_root_directory/scraped_files_folder/done.csv"
 
         done = pd.read_csv(done_file, dtype=str)
 
@@ -198,10 +205,10 @@ if __name__ == "__main__":
 
         df_source = pd.read_csv(content, dtype=str)
 
-        done.drop_duplicates()
-
         df_source.drop_duplicates()
 
+        done.drop_duplicates()
+        
         var_1 = df_source.var_1
         var_2 = df_source.var_2
         var_3 = df_source.var_3
@@ -220,6 +227,8 @@ if __name__ == "__main__":
                 pool.submit(Scraper, row)
 
             else:
+
+                print("passed")
 
                 pass
 
