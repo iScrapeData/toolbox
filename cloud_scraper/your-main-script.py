@@ -15,7 +15,6 @@ import os
 # Save files and log with Google Cloud
 from up_to_gcs import up_to_gc
 from logger import *
-from read_blob import read
 from upload_missing import blob_metadata
 
 play("your-main-script.py", "script-started")
@@ -39,7 +38,6 @@ def Scraper(row):
     # Add inter-function mutexes as well
     mutex2 = threading.Lock()
     mutex3 = threading.Lock()
-    mutex4 = threading.Lock()
 
     api_url = f"http://api.scraperapi.com?api_key=your_key&url={url[row]}"
 
@@ -148,18 +146,6 @@ def Scraper(row):
                     pass
                 mutex3.release()
 
-            mutex4.acquire()
-            with open("/home/your_root_directory/scraped_files_folder/done.csv", "a", newline="") as a:
-
-                write = csv.writer(a)
-
-                write.writerow(
-                    [
-                        var_1[row],
-                    ]
-                )
-            mutex4.release()
-
         else:
 
             response(
@@ -195,19 +181,13 @@ if __name__ == "__main__":
 
         # Prevent data race step 4, Wait before iterating
         mutex.acquire()
-        
-        done_file = f"/home/your_root_directory/scraped_files_folder/done.csv"
-
-        done = pd.read_csv(done_file, dtype=str)
 
         # Read your urls and other data from table or df file
-        content = read("bucket_name", "source_file_name") 
+        content = "/home/your_root_directory/source_file_name.csv" 
 
         df_source = pd.read_csv(content, dtype=str)
 
         df_source.drop_duplicates()
-
-        done.drop_duplicates()
         
         var_1 = df_source.var_1
         var_2 = df_source.var_2
@@ -219,18 +199,8 @@ if __name__ == "__main__":
         # Range set to 5 for local testing
         for row in range(5):  # len(df_source)
 
-            pass_1 = var_1[row] in done.col.values
-
-            if pass_1 is False:
-
-                # Enter the scraper
-                pool.submit(Scraper, row)
-
-            else:
-
-                print("passed")
-
-                pass
+            # Enter the scraper
+            pool.submit(Scraper, row)
 
             row += 1
 

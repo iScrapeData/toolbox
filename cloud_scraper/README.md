@@ -122,6 +122,18 @@ https://oit.ua.edu/wp-content/uploads/2016/10/Linux_bash_cheat_sheet.pdf
 Reading CGP blobs (files):
 https://www.kaggle.com/c/talkingdata-adtracking-fraud-detection/discussion/56014
 
+Uploading files to VM
+The quickest way to get small files such as your scripts up to your VM, is to SSH into the VM and use the VM's GUI upload icon at the top right. 
+
+However, for large files there are almost no  reasonable methods, except one:
+
+SSH into your VM and use this command:
+
+```
+gsutil cp gs://BUCKET_NAME/OBJECT_NAME SAVE_TO_LOCATION
+```
+This method is the only that I've found to be of normal speed.
+
 # GLOBAL VARS
 Any mutex that's defined outside of your function, be sure to define it as a global variable within the function. Otherwise, your workers may completely forget what a mutex is once inside your function, which will cause a hang.
 
@@ -176,7 +188,7 @@ Also, improper use of the Mutex will not throw an error. Your workers will just 
 Otherwise, you should not need the troubleshooting scripts below. I've F'd up enough for you.
 
 ## Upload Missing
-If for some reason the code leaves behind files, or you just want to verify files' existence for some reason, use the upload_missing.py (standalone) file to do work on the directory. 
+If for some reason the code leaves behind files, or you just want to verify files' existence for some reason, use the upload_missing.py file to do work on the directory. 
 
 This script has two functions. blob_metadata() simply searches for a file in gcs bucket. searchDestroy() searches for the file as well, but also uploads it if not found in gcs bucket and deletes it if it exists.
 
