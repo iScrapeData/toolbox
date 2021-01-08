@@ -15,7 +15,6 @@ import os
 # Save files and log with Google Cloud
 from up_to_gcs import up_to_gc
 from logger import *
-from upload_missing import blob_metadata
 
 play("your-main-script.py", "script-started")
 
@@ -185,9 +184,7 @@ if __name__ == "__main__":
         # Read your urls and other data from table or df file
         content = "/home/your_root_directory/source_file_name.csv" 
 
-        df_source = pd.read_csv(content, dtype=str)
-
-        df_source.drop_duplicates()
+        df_source = pd.read_csv(content, dtype=str).drop_duplicates()
         
         var_1 = df_source.var_1
         var_2 = df_source.var_2
