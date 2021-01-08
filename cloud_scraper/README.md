@@ -216,9 +216,6 @@ Run the script
 searchDestroy("/home/your_root_directory/scraped_files_folder/")
 ```
 
-## Compare Files
-In combination with the upload_missing.py, I added a script (comparison.py) to test two files are identical. You can import this into upload_missing.py to add it to your logic, or just use it as a stand alone tool.
-
 Source: https://www.geeksforgeeks.org/python-filecmp-cmp-method/
 
 
