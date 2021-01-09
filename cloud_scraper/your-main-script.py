@@ -134,6 +134,8 @@ def Scraper(row):
                         e,
                     )
 
+                    pass
+
                 # Delete local file
                 mutex3.acquire()
                 if os.path.exists(f"/home/your_root_directory/scraped_files_folder/{filename[row]}"):
@@ -159,6 +161,8 @@ def Scraper(row):
                 f"status-code-{status_code}",
             )
 
+            pass
+
     except Exception as e:
 
         primaryFailed(
@@ -172,6 +176,8 @@ def Scraper(row):
             url[row],
             e,
         )
+
+        pass
 
 
 if __name__ == "__main__":
