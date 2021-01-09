@@ -39,16 +39,22 @@ def Scraper(row):
     api_url = f"http://api.scraperapi.com?api_key=your_key&url={url[row]}"
 
     # Logging the relevant variables before using them
-    variables(
-        "your-main-script.py",
-        "relevant-variables",
-        var_1[row],
-        var_2[row],
-        var_3[row],
-        var_4[row],
-        filename[row],
-        url[row],
-    )
+    try:
+
+        variables(
+            "your-main-script.py",
+            "relevant-variables",
+            var_1[row],
+            var_2[row],
+            var_3[row],
+            var_4[row],
+            filename[row],
+            url[row],
+        )
+
+    except:
+
+        pass
 
     try:
 
@@ -80,18 +86,24 @@ def Scraper(row):
 
             #  If abort is true log it and get out of the loop
             if abort is True:
+                
+                try:
 
-                aborted(
-                    "your-main-script.py",
-                    "aborted",
-                    var_1[row],
-                    var_2[row],
-                    var_3[row],
-                    var_4[row],
-                    filename[row],
-                    url[row],
-                    "html-not-desired",
-                )
+                    aborted(
+                        "your-main-script.py",
+                        "aborted",
+                        var_1[row],
+                        var_2[row],
+                        var_3[row],
+                        var_4[row],
+                        filename[row],
+                        url[row],
+                        "html-not-desired",
+                    )
+
+                except:
+
+                    pass
 
             else:
 
@@ -119,18 +131,24 @@ def Scraper(row):
                     mutex2.release()
 
                 except Exception as e:
-                                      
-                    UploadError(
-                        "your-main-script.py",
-                        "Upload Error",
-                        var_1[row],
-                        var_2[row],
-                        var_3[row],
-                        var_4[row],
-                        filename[row],
-                        url[row],
-                        e,
-                    )
+
+                    try: 
+
+                        UploadError(
+                            "your-main-script.py",
+                            "Upload Error",
+                            var_1[row],
+                            var_2[row],
+                            var_3[row],
+                            var_4[row],
+                            filename[row],
+                            url[row],
+                            e,
+                        )
+
+                    except:
+
+                        pass
 
                 # Delete local file
                 mutex3.acquire()
@@ -145,31 +163,43 @@ def Scraper(row):
 
         else:
 
-            response(
+            try:
+
+                response(
+                    "your-main-script.py",
+                    "url-response",
+                    var_1[row],
+                    var_2[row],
+                    var_3[row],
+                    var_4[row],
+                    filename[row],
+                    url[row],
+                    f"status-code-{status_code}",
+                )
+
+            except:
+
+                pass
+
+    except Exception as e:
+
+        try:
+
+            primaryFailed(
                 "your-main-script.py",
-                "url-response",
+                "main-block-exception",
                 var_1[row],
                 var_2[row],
                 var_3[row],
                 var_4[row],
                 filename[row],
                 url[row],
-                f"status-code-{status_code}",
+                e,
             )
 
-    except Exception as e:
+        except:
 
-        primaryFailed(
-            "your-main-script.py",
-            "main-block-exception",
-            var_1[row],
-            var_2[row],
-            var_3[row],
-            var_4[row],
-            filename[row],
-            url[row],
-            e,
-        )
+            pass
 
 
 if __name__ == "__main__":
