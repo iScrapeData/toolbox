@@ -163,9 +163,15 @@ If you want to know more about this, read this article: https://support.ehelp.ed
 If you need to work with your processes e.g. view and/or kill, see this article: https://phoenixnap.com/kb/how-to-kill-a-process-in-linux
 
 # TROUBLESHOOTING
-This section is most useful if you somehow inappropriately alter the code for GCP uploading, logging, or mutex placement. As these methods may not throw an error, but will cause your workers to skip all code that follows if used improperly. Also, if you use this program on a local computer and network with insufficient resources. And finally, this section is useful because the program just isn't perfect.
+This section is most useful if you somehow inappropriately alter the code for GCP uploading, logging, or mutex placement. As these methods may not throw an error, but will cause your workers to skip all code. And with concurrent programming rapid calls to GCP logging fails rapidly. 
+
+This section is also useful if you use this program on a local computer and network with insufficient resources. 
+
+And finally, this section is useful because the program just isn't perfect.
 
 Example:
+Be careful with auto format features in your IDE. Here's why:
+
 Correct
 
 ```
@@ -178,11 +184,13 @@ Incorrect
 up_to_gc("get-data-scrapers", f"{filing_type}_{filename[row]}", f"historical_subs/subs/Other/{filing_type}_{filename[row]}",)
 ```
 
-That extra comma may not throw an error Python, though it is an error because GCP hates trailing commas. And it will kill your worker as described above.
+That extra comma that your IDE added may be benign in Python, but it is an error because GCP hates trailing commas. And it will silently kill your worker as described above if it's not in a try block.
 
-Also, improper use of the Mutex will not throw an error. Your workers will just do funny things like, stopping a the code just above where the error exists.
+Also, improper use of the Mutex will not throw an error. Your workers will just do funny things.
 
 Otherwise, you should not need the troubleshooting scripts below. I've F'd up enough for you.
+
+Finally, minimize your interactions with GCP in your code. It is a hotbed of not just silent errors as explained above, but also it decreases performance overall. And a scraper is supposed to be lightweight and efficient.
 
 ## Upload Missing
 If for some reason the code leaves behind files, or you just want to verify files' existence for some reason, use the upload_missing.py file to do work on the directory. 

@@ -14,7 +14,7 @@ import os
 
 # Save files and log with Google Cloud
 from up_to_gcs import up_to_gc
-from logger import *
+from logger import play, finish
 
 play("your-main-script.py", "script-started")
 
@@ -38,23 +38,7 @@ def Scraper(row):
 
     api_url = f"http://api.scraperapi.com?api_key=your_key&url={url[row]}"
 
-    # Logging the relevant variables before using them
-    try:
-
-        variables(
-            "your-main-script.py",
-            "relevant-variables",
-            var_1[row],
-            var_2[row],
-            var_3[row],
-            var_4[row],
-            filename[row],
-            url[row],
-        )
-
-    except:
-
-        pass
+    # TODO: Log relevant variables before using them
 
     try:
 
@@ -66,141 +50,74 @@ def Scraper(row):
 
             text = req.text
 
-            requested(
-                    "your-main-script.py",
-                    "request-log",
-                    row,
-                    status_code,
-                    text[:25],
-                    url[row],
-                )
+            # TODO: Log each request
+    except:
 
-        if status_code >= 200 and status_code < 300:
+        # TODO: Handel request errors  
+        pass
 
-            # You can make this anything, 
-            # i.e. a function or whatever.
-            # It's just a check for some quality in the page 
-            # being scraped to let us know if we want to keep it 
-            # or not.
-            abort = False
+    if status_code >= 200 and status_code < 300:
 
-            #  If abort is true log it and get out of the loop
-            if abort is True:
-                
-                try:
+        # You can make this anything, 
+        # i.e. a function or whatever.
+        # It's just a check for some quality in the page 
+        # being scraped to let us know if we want to keep it 
+        # or not.
+        abort = False
 
-                    aborted(
-                        "your-main-script.py",
-                        "aborted",
-                        var_1[row],
-                        var_2[row],
-                        var_3[row],
-                        var_4[row],
-                        filename[row],
-                        url[row],
-                        "html-not-desired",
-                    )
-
-                except:
-
-                    pass
-
-            else:
-
-                # Your filename should have been prefabricated.
-                # I have such a tool in this repository:
-                # "build_urls"
-                # NOTE: Be careful here, the way I have it set 
-                # up to create the filename, is that the file 
-                # extension is already included. Don't reappend 
-                # here.
-                with open(f"/home/your_root_directory/scraped_files_folder/{filename[row]}", "w") as f:
-
-                    # Write
-                    f.write(text)
-
-                # Upload
-                try: 
-
-                    mutex2.acquire()
-                    up_to_gc(
-                        "bucket-name",
-                        f"/home/your_root_directory/scraped_files_folder/{filename[row]}",
-                        f"psuedo/path/to/{filename[row]}"
-                    )
-                    mutex2.release()
-
-                except Exception as e:
-
-                    try: 
-
-                        UploadError(
-                            "your-main-script.py",
-                            "Upload Error",
-                            var_1[row],
-                            var_2[row],
-                            var_3[row],
-                            var_4[row],
-                            filename[row],
-                            url[row],
-                            e,
-                        )
-
-                    except:
-
-                        pass
-
-                # Delete local file
-                mutex3.acquire()
-                if os.path.exists(f"/home/your_root_directory/scraped_files_folder/{filename[row]}"):
-
-                    os.remove(f"/home/your_root_directory/scraped_files_folder/{filename[row]}")
-                    
-                else:
-                  
-                    pass
-                mutex3.release()
-
-        else:
-
-            try:
-
-                response(
-                    "your-main-script.py",
-                    "url-response",
-                    var_1[row],
-                    var_2[row],
-                    var_3[row],
-                    var_4[row],
-                    filename[row],
-                    url[row],
-                    f"status-code-{status_code}",
-                )
-
-            except:
-
-                pass
-
-    except Exception as e:
-
-        try:
-
-            primaryFailed(
-                "your-main-script.py",
-                "main-block-exception",
-                var_1[row],
-                var_2[row],
-                var_3[row],
-                var_4[row],
-                filename[row],
-                url[row],
-                e,
-            )
-
-        except:
+        #  If abort is true log it and get out of the loop
+        if abort is True:
+            
+            # TODO: Log abortions
 
             pass
 
+        else:
+
+            # Your filename should have been prefabricated.
+            # I have such a tool in this repository:
+            # "build_urls"
+            # NOTE: Be careful here, the way I have it set 
+            # up to create the filename, is that the file 
+            # extension is already included. Don't reappend 
+            # here.
+            with open(f"/home/your_root_directory/scraped_files_folder/{filename[row]}", "w") as f:
+
+                # Write
+                f.write(text)
+
+            # Upload
+            try: 
+
+                mutex2.acquire()
+                up_to_gc(
+                    "bucket-name",
+                    f"/home/your_root_directory/scraped_files_folder/{filename[row]}",
+                    f"psuedo/path/to/{filename[row]}"
+                )
+                mutex2.release()
+
+            except:
+
+                # TODO: Handel upload error
+
+                pass
+
+            # Delete local file
+            mutex3.acquire()
+            if os.path.exists(f"/home/your_root_directory/scraped_files_folder/{filename[row]}"):
+
+                os.remove(f"/home/your_root_directory/scraped_files_folder/{filename[row]}")
+                
+            else:
+              
+                pass
+            mutex3.release()
+
+    else:
+
+        # TODO: Log and handle negative status codes
+        pass
 
 if __name__ == "__main__":
 
