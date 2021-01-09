@@ -134,9 +134,6 @@ gsutil cp gs://BUCKET_NAME/OBJECT_NAME SAVE_TO_LOCATION
 ```
 This method is the only that I've found to be of normal speed.
 
-# GLOBAL VARS
-Any mutex that's defined outside of your function, be sure to define it as a global variable within the function. Otherwise, your workers may completely forget what a mutex is once inside your function, which will cause a hang.
-
 # ULIMIT
 Increase your ulimit to something respectable if you're on a linux or Debian VM like I use. Otherwise, you may get a "too many files open" error. Also, you have to do this every time you connect to your VM instance (no restart, but connect).
 

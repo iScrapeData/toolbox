@@ -24,6 +24,8 @@ row = 0
 # Prevent data race step 3, Construct Lock
 # Create lock(s)
 mutex = threading.Lock()
+mutex2 = threading.Lock()
+mutex3 = threading.Lock()
 
 # Scraper/Main function
 def Scraper(row):
@@ -33,10 +35,6 @@ def Scraper(row):
     global var_2
     global var_3
     global var_4
-    global mutex
-    # Add inter-function mutexes as well
-    mutex2 = threading.Lock()
-    mutex3 = threading.Lock()
 
     api_url = f"http://api.scraperapi.com?api_key=your_key&url={url[row]}"
 
@@ -134,8 +132,6 @@ def Scraper(row):
                         e,
                     )
 
-                    pass
-
                 # Delete local file
                 mutex3.acquire()
                 if os.path.exists(f"/home/your_root_directory/scraped_files_folder/{filename[row]}"):
@@ -161,8 +157,6 @@ def Scraper(row):
                 f"status-code-{status_code}",
             )
 
-            pass
-
     except Exception as e:
 
         primaryFailed(
@@ -176,8 +170,6 @@ def Scraper(row):
             url[row],
             e,
         )
-
-        pass
 
 
 if __name__ == "__main__":
